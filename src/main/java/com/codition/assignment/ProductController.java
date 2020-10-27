@@ -26,7 +26,6 @@ public class ProductController {
 
     @Autowired
     ProductRepository productRepository;
-     
 
     @GetMapping(value = "/test")
     public String getMethodName() {
@@ -70,10 +69,19 @@ public class ProductController {
 
     }
 
-    @PutMapping(value = "product/{id}")
-    public Product updateProduct(@PathVariable String id, @RequestBody Product entity) {
+    @PutMapping(value = "product/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Product> updateProduct(@PathVariable String id, @RequestBody Product entity) {
+        try {
+            Product _product = null;
+            if (productRepository.existsById(id)) {
+                _product = productRepository.save(entity);
+            }
 
-        return entity;
+            return new ResponseEntity<>(_product, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
